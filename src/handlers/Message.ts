@@ -1,9 +1,11 @@
+import {deduplicate} from "@spectacle-client/dedupe.ts";
 import {
     GatewayMessageCreateDispatchData,
     GatewayMessageDeleteBulkDispatchData,
     GatewayMessageDeleteDispatchData,
     GatewayMessageUpdateDispatchData
 } from "discord-api-types/v10";
+import {writeFileSync} from "fs";
 import {GatewayBroker} from "../Broker.js";
 import {del, scanKeys, set, update} from "../util/redis/index.js";
 import {CacheNames} from "../util/validateConfig.js";
@@ -19,6 +21,8 @@ export async function MessageCreate(broker: GatewayBroker, data: string) {
 
     const channelKey = `${CacheNames.Channel}:${parsed.guild_id ?? "dm"}:${parsed.channel_id}`;
     await update(broker, CacheNames.Channel, channelKey, {last_message_id: parsed.id}, true);
+
+    await writeFileSync(`training_data/${CacheNames.Message}/${parsed.id}`, JSON.stringify(deduplicate(CacheNames.Message, parsed)));
 }
 
 export async function MessageUpdate(broker: GatewayBroker, data: string) {

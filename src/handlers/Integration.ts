@@ -1,8 +1,10 @@
+import {deduplicate} from "@spectacle-client/dedupe.ts";
 import {
     GatewayIntegrationCreateDispatchData,
     GatewayIntegrationDeleteDispatchData,
     GatewayIntegrationUpdateDispatchData
 } from "discord-api-types/v10";
+import {writeFileSync} from "fs";
 import {GatewayBroker} from "../Broker.js";
 import {del, set, update} from "../util/redis/index.js";
 import {CacheNames} from "../util/validateConfig.js";
@@ -15,6 +17,8 @@ export async function IntegrationCreate(broker: GatewayBroker, data: string) {
     await set(broker, entity, key, data);
 
     await IntegrationCreateUpdateCascade(broker, parsed);
+
+    await writeFileSync(`training_data/${CacheNames.Integration}/${parsed.id}`, JSON.stringify(deduplicate(CacheNames.Integration, parsed)));
 }
 
 export async function IntegrationUpdate(broker: GatewayBroker, data: string) {

@@ -1,5 +1,5 @@
 import {Amqp as AmqpBroker, Broker, Redis as RedisBroker} from "@spectacles/brokers";
-import {readFileSync} from "fs";
+import {readFileSync, mkdirSync} from "fs";
 import Redis, {Cluster, Result} from "ioredis";
 import * as Util from "util";
 import {CacheNameEvents, GatewayEvents} from "./constants/CacheNameEvents.js";
@@ -48,6 +48,13 @@ export class GatewayBroker {
             const amqp = new AmqpBroker(this.config.broker.group || "cache");
             await amqp.connect(this.config.broker.urls[0]);
             this.broker = amqp;
+        }
+    }
+
+    public static initTrainingData() {
+        for (const cacheName of Object.values(CacheNames)) {
+            mkdirSync(`training_data/${cacheName}`, {recursive: true});
+            console.log(`Created directory training_data/${cacheName}`);
         }
     }
 

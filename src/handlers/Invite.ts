@@ -1,4 +1,6 @@
+import {deduplicate} from "@spectacle-client/dedupe.ts";
 import {GatewayInviteCreateDispatchData} from "discord-api-types/v10";
+import {writeFileSync} from "fs";
 import {GatewayBroker} from "../Broker.js";
 import {del, set, update} from "../util/redis/index.js";
 import {CacheNames} from "../util/validateConfig.js";
@@ -19,6 +21,8 @@ export async function InviteCreate(broker: GatewayBroker, data: string) {
         const userKey = `${CacheNames.User}:${parsed.target_user.id}`;
         await update(broker, CacheNames.User, userKey, parsed.target_user);
     }
+
+    await writeFileSync(`training_data/${CacheNames.Invite}/${parsed.code}`, JSON.stringify(deduplicate(CacheNames.Invite, parsed)));
 }
 
 export async function InviteDelete(broker: GatewayBroker, data: string) {
