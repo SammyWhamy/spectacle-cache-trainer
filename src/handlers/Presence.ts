@@ -1,4 +1,6 @@
+import {deduplicate} from "@spectacle-client/dedupe.ts";
 import {GatewayPresenceUpdateDispatchData} from "discord-api-types/v10";
+import {writeFileSync} from "fs";
 import {GatewayBroker} from "../Broker.js";
 import {update} from "../util/redis/index.js";
 import {CacheNames} from "../util/validateConfig.js";
@@ -12,4 +14,6 @@ export async function PresenceUpdate(broker: GatewayBroker, data: string) {
 
     const userKey = `${CacheNames.User}:${parsed.user.id}`;
     await update(broker, CacheNames.User, userKey, parsed.user);
+
+    await writeFileSync(`training_data/${CacheNames.Presence}/${parsed.user.id}`, JSON.stringify(deduplicate(CacheNames.Presence, parsed)));
 }

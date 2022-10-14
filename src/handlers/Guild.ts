@@ -17,8 +17,6 @@ export async function GuildCreate(broker: GatewayBroker, data: string) {
     await set(broker, entity, key, data);
 
     await GuildCascade(broker, parsed);
-
-    await writeFileSync(`training_data/${CacheNames.Guild}/${parsed.id}`, JSON.stringify(deduplicate(CacheNames.Guild, parsed)));
 }
 
 export async function GuildUpdate(broker: GatewayBroker, data: string) {
@@ -112,11 +110,9 @@ export async function GuildCascade(broker: GatewayBroker, data: GatewayGuildCrea
         for (const member of data.members) {
             const memberKey = `${CacheNames.Member}:${data.id}:${member.user!.id}`;
             await update(broker, CacheNames.Member, memberKey, member);
-            await writeFileSync(`training_data/${CacheNames.Member}/${member.user!.id}`, JSON.stringify(deduplicate(CacheNames.Member, member)));
 
             const userKey = `${CacheNames.User}:${member.user!.id}`;
             await update(broker, CacheNames.User, userKey, member.user!);
-            await writeFileSync(`training_data/${CacheNames.User}/${member.user!.id}`, JSON.stringify(deduplicate(CacheNames.User, member.user!)));
         }
     }
 
@@ -124,7 +120,6 @@ export async function GuildCascade(broker: GatewayBroker, data: GatewayGuildCrea
         for (const channel of data.channels) {
             const channelKey = `${CacheNames.Channel}:${data.id}:${channel.id}`;
             await update(broker, CacheNames.Channel, channelKey, channel);
-            await writeFileSync(`training_data/${CacheNames.Channel}/${channel.id}`, JSON.stringify(deduplicate(CacheNames.Channel, channel)));
         }
     }
 
@@ -162,7 +157,6 @@ export async function GuildCascade(broker: GatewayBroker, data: GatewayGuildCrea
         for (const role of data.roles) {
             const roleKey = `${CacheNames.Role}:${data.id}:${role.id}`;
             await update(broker, CacheNames.Role, roleKey, role);
-            await writeFileSync(`training_data/${CacheNames.Role}/${role.id}`, JSON.stringify(deduplicate(CacheNames.Role, role)));
         }
     }
 
@@ -171,7 +165,6 @@ export async function GuildCascade(broker: GatewayBroker, data: GatewayGuildCrea
             if (!emoji.id) continue;
             const emojiKey = `${CacheNames.Emoji}:${data.id}:${emoji.id}`;
             await update(broker, CacheNames.Emoji, emojiKey, emoji);
-            await writeFileSync(`training_data/${CacheNames.Emoji}/${emoji.id}`, JSON.stringify(deduplicate(CacheNames.Emoji, emoji)));
         }
     }
 

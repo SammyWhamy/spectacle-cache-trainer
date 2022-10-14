@@ -1,11 +1,9 @@
-import {deduplicate} from "@spectacle-client/dedupe.ts";
 import {
     GatewayGuildMemberAddDispatchData,
     GatewayGuildMemberRemoveDispatchData,
     GatewayGuildMembersChunkDispatchData,
     GatewayGuildMemberUpdateDispatchData
 } from "discord-api-types/v10";
-import {writeFileSync} from "fs";
 import {GatewayBroker} from "../Broker.js";
 import {del, set, update} from "../util/redis/index.js";
 import {CacheNames} from "../util/validateConfig.js";
@@ -18,8 +16,6 @@ export async function GuildMemberAdd(broker: GatewayBroker, data: string) {
     await set(broker, entity, key, data);
 
     await GuildMemberCascade(broker, parsed);
-
-    await writeFileSync(`training_data/${CacheNames.Member}/${parsed.user!.id}`, JSON.stringify(deduplicate(CacheNames.Member, parsed)));
 }
 
 export async function GuildMemberUpdate(broker: GatewayBroker, data: string) {
